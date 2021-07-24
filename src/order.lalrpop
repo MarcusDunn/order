@@ -1,48 +1,32 @@
-use crate::ast::{Type, Identifier, FunctionDeclaration, Branch, Primitive, Expr, DataDeclaration};
+use crate::lexer::{Token, Error};
+use crate::ast::{NumberLiteral};
+
 use std::str::FromStr;
 
-grammar;
+grammar<'input>(text: &'input str);
 
-pub FunctionDeclaration: FunctionDeclaration = {
-    <Identifier> "::" <FunctionType> <Branches> => FunctionDeclaration::new(<>)
+pub NumberLiteral: NumberLiteral = {
+    "NumberLiteral" => NumberLiteral::from_str(<>).unwrap()
 };
 
-pub DataDeclaration: DataDeclaration = {
-    "data" <id:Identifier> "=" <mut v:(<Expr> "|")*> <l:Expr?> =>    {
-                                                                    let v = match l {Some(id) => {v.push(id); v}, None => v};
-                                                                    DataDeclaration::new(id, v)
-                                                                    }
-}
+extern {
+    type Location = usize;
+    type Error = Error;
 
-Branches: Vec<Branch> = <("|" <Branch>)+>;
-
-Branch: Branch = {
-    <Pattern> "=" <Action> => Branch::new(<>)
-};
-
-Pattern: Vec<Expr> = <mut v:(<Expr> ",")*> <l:Expr?> =>  match l {Some(id) => {v.push(id); v}, None => v};
-
-Action: Vec<Expr> = <mut v:(<Expr> ",")*> <l:Expr?> => match l {Some(id) => {v.push(id); v}, None => v};
-
-FunctionType: Type = {
-    <t:Type> "->" <r:FunctionType> => Type::Func(Box::new(t), Box::new(r)),
-    Type
-}
-
-Expr: Expr = {
-    <Identifier> => Expr::Iden(<>),
-    <Primitive> => Expr::Prim(<>),
-}
-
-Type: Type = {
-    "(" <FunctionType> ")",
-    <Identifier> => Type::Iden(<>),
-};
-
-Identifier: Identifier = {
-    <r"[A-z]+"> => Identifier::new(String::from(<>))
-};
-
-Primitive: Primitive = {
-    <r"[0-9]+_u32"> => Primitive::U32(u32::from_str(<>.strip_suffix("_u32").unwrap()).unwrap())
+    enum Token<'input> {
+        "data" => Token::Data,
+        "where" => Token::Where,
+        "->" => Token::SkinnyArrow,
+        ":" => Token::Colon,
+        "=" => Token::Equals,
+        "\n" => Token::NewLine,
+        " " => Token::Space,
+        "\t" => Token::Tab,
+        "--" => Token::DoubleDash,
+        "(" => Token::LeftParen,
+        ")" => Token::RightParen,
+        "Identifier" => Token::Identifier(<&'input str>),
+        "NumberLiteral" => Token::NumberLiteral(<&'input str>),
+        "IdentifierSeries" => Token::IdentifierSeries(<&'input str>),
+    }
 }

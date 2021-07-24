@@ -1,76 +1,23 @@
-use std::collections::HashSet;
-use std::iter::FromIterator;
+use std::convert::Infallible;
+use std::str::FromStr;
 
-#[derive(Debug)]
-pub struct FunctionDeclaration {
-    name: Identifier,
-    declared_type: Type,
-    branches: Vec<Branch>,
-}
-
-impl FunctionDeclaration {
-    pub fn new(name: Identifier, declared_type: Type, branches: Vec<Branch>) -> FunctionDeclaration {
-        FunctionDeclaration {
-            name,
-            declared_type,
-            branches,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct DataDeclaration {
-    name: Identifier,
-    // cannot repeat data
-    data: HashSet<Expr>,
-}
-
-impl DataDeclaration {
-    pub fn new(name: Identifier, data: Vec<Expr>) -> DataDeclaration {
-        DataDeclaration {
-            name,
-            data: HashSet::from_iter(data),
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct Branch {
-    pattern: Vec<Expr>,
-    action: Vec<Expr>,
-}
-
-impl Branch {
-    pub fn new(pattern: Vec<Expr>, action: Vec<Expr>) -> Branch {
-        Branch {
-            pattern,
-            action,
-        }
-    }
-}
-
-#[derive(Debug, Eq, Hash, PartialEq)]
-pub struct Identifier(String);
-
-impl Identifier {
-    pub fn new(str: String) -> Identifier {
-        Identifier(str)
-    }
-}
-
-#[derive(Debug)]
-pub enum Type {
-    Func(Box<Type>, Box<Type>),
-    Iden(Identifier),
-}
-
-#[derive(Debug, Eq, PartialEq, Hash)]
-pub enum Expr {
-    Iden(Identifier),
-    Prim(Primitive),
-}
-
-#[derive(Debug, Eq, Hash, PartialEq)]
-pub enum Primitive {
+pub enum NumberLiteral {
     U32(u32)
+}
+
+
+impl FromStr for NumberLiteral {
+    // the lexer should guarantee this always works
+    type Err = Infallible;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if let [number @ .., kind] = s.split('_').collect::<Vec<_>>().as_slice() {
+            match *kind {
+                "u32" => Ok(NumberLiteral::U32(u32::from_str(&number.join("")).unwrap())),
+                _ => unimplemented!()
+            }
+        } else {
+            unreachable!()
+        }
+    }
 }
