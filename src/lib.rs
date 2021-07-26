@@ -61,13 +61,23 @@ mod tests {
     }
 
     #[test]
+    fn test_signature4() {
+        OrderParser::parse(Rule::typeSignature, "Int -> Int -> Int  ").unwrap();
+    }
+
+    #[test]
     fn test_declaration1() {
         OrderParser::parse(Rule::declaration, "one :: Int\n").unwrap();
     }
 
     #[test]
     fn test_declaration2() {
-        OrderParser::parse(Rule::declaration, "addOne :: Int -> Int\n").unwrap();
+        OrderParser::parse(Rule::declaration, "one :: Int \n").unwrap();
+    }
+
+    #[test]
+    fn test_declaration3() {
+        OrderParser::parse(Rule::declaration, "one :: Int -> Int\n").unwrap();
     }
 
     #[test]
@@ -84,9 +94,9 @@ mod tests {
     fn test_resolver() {
         OrderParser::parse(Rule::resolver, "id a = a\n").unwrap();
     }
-    //
-    // #[test]
-    // fn test_function_definition() {
-    //     OrderParser::parse(Rule::functionDefinition, "id :: Int -> Int\nid a = a\n\n").unwrap();
-    // }
+
+    #[test]
+    fn test_function_definition1() {
+        OrderParser::parse(Rule::functionDefinition, "one :: Int\nid a = a\n\n").unwrap();
+    }
 }
