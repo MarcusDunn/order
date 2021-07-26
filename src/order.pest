@@ -2,9 +2,9 @@ number = { "-"? ~ ASCII_DIGIT ~ (ASCII_DIGIT | "_")* }
 string = { "\"" ~ (ASCII_ALPHANUMERIC | " ")* ~ "\"" }
 literal = { number | string }
 identifier = { ASCII_ALPHA ~ ASCII_ALPHANUMERIC* }
-typeSignature = { (identifier ~ " -> " ~ typeSignature) | identifier }
-declaration = { identifier ~ " :: " ~ typeSignature ~ " "* ~ "\n" }
-pattern = { (identifier | literal) ~ (" " ~ pattern)? }
-action = { (identifier | literal) ~ (" " ~ action)? }
-resolver = { identifier ~ " " ~ pattern ~ " = " ~ action ~ "\n" }
+typeSignature = { (identifier ~ " "* ~ "->" ~ " "* ~ typeSignature) | identifier }
+declaration = { identifier ~ " "* ~ "::" ~ " "* ~ typeSignature ~ " "* ~ "\n" }
+pattern = { (identifier | literal) ~ " "* ~ pattern? }
+action = { (identifier | literal) ~ " "* ~ action? }
+resolver = { identifier ~ " "+ ~ pattern? ~ " "* ~ "=" ~ " "* ~ action ~ "\n" }
 functionDefinition = { declaration ~ resolver+ ~ "\n" }
