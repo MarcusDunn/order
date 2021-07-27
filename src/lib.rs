@@ -1,4 +1,6 @@
-use pest::Parser;
+#![deny(clippy::all)]
+#![deny(unsafe_code)]
+
 use pest_derive::Parser;
 
 #[derive(Parser)]
@@ -7,6 +9,8 @@ pub struct OrderParser;
 
 #[cfg(test)]
 mod tests {
+    use pest::Parser;
+
     use super::*;
 
     #[test]
@@ -52,7 +56,7 @@ mod tests {
     #[test]
     fn test_identifier3() {
         let mut parsed = OrderParser::parse(Rule::identifier, "addOne  bida\tokf\n\tsdlh\n").unwrap();
-        assert!(parsed.next().unwrap().as_span().as_str() == "addOne")
+        assert_eq!(parsed.next().unwrap().as_span().as_str(), "addOne")
     }
 
     #[test]
