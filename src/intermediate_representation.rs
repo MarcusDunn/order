@@ -10,7 +10,6 @@ pub enum Type {
     Atom(AtomicType),
 }
 
-
 enum AtomicType {
     BinaryProductType(BinaryProductType),
     DependentProductType(DependentProductType),
@@ -22,7 +21,6 @@ struct BinaryProductType {
     right: Box<Type>,
 }
 
-
 mod dependent_product_type {
     use crate::intermediate_representation::{Context, Term, Type};
 
@@ -31,14 +29,16 @@ mod dependent_product_type {
         dependee: Box<Type>,
     }
 
-
     impl DependentProductType {
         // make sure to typecheck the term
-        pub fn new(context: &Context, family: Box<dyn Fn(Term) -> Type>, term: Term) -> Result<Self, &'static str> {
+        pub fn new(
+            context: &Context,
+            family: Box<dyn Fn(Term) -> Type>,
+            term: Term,
+        ) -> Result<Self, &'static str> {
             todo!()
         }
     }
 }
-
 
 pub struct Term {}

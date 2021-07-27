@@ -2,5 +2,5 @@
 #![deny(unsafe_code)]
 
 mod backend;
-mod intermediate_representation;
 mod frontend;
+mod intermediate_representation;

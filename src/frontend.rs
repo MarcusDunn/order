@@ -52,7 +52,8 @@ mod tests {
 
     #[test]
     fn test_identifier3() {
-        let mut parsed = OrderParser::parse(Rule::identifier, "addOne  bida\tokf\n\tsdlh\n").unwrap();
+        let mut parsed =
+            OrderParser::parse(Rule::identifier, "addOne  bida\tokf\n\tsdlh\n").unwrap();
         assert_eq!(parsed.next().unwrap().as_span().as_str(), "addOne")
     }
 
