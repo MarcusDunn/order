@@ -11,7 +11,7 @@ a parser, a type checker, and an interpreter for a language implementing [Martin
 - [ ] Sound
 - [ ] Well Tested
 
-## non-goals (we're nailing these)
+## Non-Goals (we're nailing these)
 
 - [x] being at at all useful
 - [x] good error messages
