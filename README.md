@@ -1,4 +1,5 @@
 # order
+![tests](https://github.com/MarcusDunn/order/actions/workflows/test/badge.svg)
 a very simple dependantly typed language
 
 I'm using this to learn compilers. It will be 90% a disaster but hopfuly I'll learn something interesting along the way.
