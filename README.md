@@ -1,4 +1,5 @@
 # Order
+![Build](https://github.com/MarcusDunn/order/actions/workflows/build.yml/badge.svg)
 
 a parser, a type checker, and an interpreter for a language implementing [Martin-Löf type theory](https://en.wikipedia.org/wiki/Intuitionistic_type_theory) (hopefully)
 
