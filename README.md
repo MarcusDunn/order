@@ -1,9 +1,9 @@
-# order
+# Order
 ![build](https://github.com/MarcusDunn/order/actions/workflows/rust.yml/badge.svg)
 
 a parser, a type checker, and an interpreter for a language implementing [Martin-Löf type theory](https://en.wikipedia.org/wiki/Intuitionistic_type_theory) (hopefully)
 
-# Goals (WIP)
+## Goals (WIP)
 
 - [ ] Parser
 - [ ] Type Checker
@@ -11,7 +11,7 @@ a parser, a type checker, and an interpreter for a language implementing [Martin
 - [ ] Sound
 - [ ] Well Tested
 
-# non-goals (we're nailing these)
+## non-goals (we're nailing these)
 
 - [x] being at at all useful
 - [x] good error messages
