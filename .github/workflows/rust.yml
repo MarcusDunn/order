@@ -35,6 +35,10 @@ jobs:
         run: |
           cargo install cargo2junit grcov;
           cargo test $CARGO_OPTIONS -- -Z unstable-options --format json | cargo2junit > results.xml;
+      - name: boi
+        run: |
+          file results.xml;
+          less results.xml;
       - uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
