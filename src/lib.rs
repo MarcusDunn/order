@@ -1,3 +1,4 @@
+#![feature(box_syntax)]
 #![deny(clippy::all)]
 #![deny(unsafe_code)]
 
