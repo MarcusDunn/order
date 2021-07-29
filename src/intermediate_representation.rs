@@ -27,7 +27,6 @@ enum Type {
     Function(Box<Type>, Box<Type>),
 }
 
-
 #[derive(Clone)]
 enum Value {
     Lambda(Box<fn(Value) -> Value>),
@@ -133,11 +132,7 @@ impl Context {
             }),
             (TermDa::Lambda(box e), Type::Function(box t, box tp)) => {
                 self.0.push((Name::Local(i), Info::HasType(t.clone())));
-                self.type_da(
-                    i + 1,
-                    subst_da(0, &TermUa::Free(Name::Local(i)), e),
-                    tp,
-                )
+                self.type_da(i + 1, subst_da(0, &TermUa::Free(Name::Local(i)), e), tp)
             }
             _ => Err(String::from("type mismatch")),
         }
@@ -146,9 +141,7 @@ impl Context {
 
 fn subst_ua(i: i32, r: &TermUa, inferable_term: TermUa) -> TermUa {
     match inferable_term {
-        TermUa::Annotated(box e, t) => {
-            TermUa::Annotated(box subst_da(i, r, e), t)
-        }
+        TermUa::Annotated(box e, t) => TermUa::Annotated(box subst_da(i, r, e), t),
         TermUa::Bound(j) => {
             if i == j {
                 r.clone()
@@ -157,11 +150,9 @@ fn subst_ua(i: i32, r: &TermUa, inferable_term: TermUa) -> TermUa {
             }
         }
         TermUa::Free(y) => TermUa::Free(y),
-        TermUa::Application(e, box ep) => subst_ua(
-            i,
-            r,
-            TermUa::Application(e, box subst_da(i, r, ep)),
-        ),
+        TermUa::Application(e, box ep) => {
+            subst_ua(i, r, TermUa::Application(e, box subst_da(i, r, ep)))
+        }
     }
 }
 
@@ -170,11 +161,7 @@ subst↓ :: Int →Term↑ →Term↓ →Term↓
 subst↓ i r (Inf e)=Inf (subst↑ i r e)
 subst↓ i r (Lam e)=Lam (subst↓ (i +1)r e)
  */
-fn subst_da(
-    i: i32,
-    inferable_term: &TermUa,
-    checkable_term: TermDa,
-) -> TermDa {
+fn subst_da(i: i32, inferable_term: &TermUa, checkable_term: TermDa) -> TermDa {
     match checkable_term {
         TermDa::Inferable(box e) => TermDa::Inferable(box subst_ua(i, inferable_term, e)),
         TermDa::Lambda(box e) => TermDa::Lambda(box subst_da(i + 1, inferable_term, e)),
@@ -211,10 +198,7 @@ neutralQuote i (NApp n v)=neutralQuote i n :@: quote i v
 fn neutral_quote(i: i32, n: Neutral) -> TermUa {
     match n {
         Neutral::Free(x) => bound_free(i, x),
-        Neutral::App(box n, box v) => TermUa::Application(
-            box neutral_quote(i, n),
-            box quote(i, v),
-        ),
+        Neutral::App(box n, box v) => TermUa::Application(box neutral_quote(i, n), box quote(i, v)),
     }
 }
 
@@ -243,7 +227,9 @@ mod tests {
     #[test]
     fn create_const() {
         // const′ =Lam (Lam (Inf (Bound 1)))
-        let _const = TermDa::Lambda(box TermDa::Lambda(box TermDa::Inferable(box TermUa::Bound(1))));
+        let _const = TermDa::Lambda(box TermDa::Lambda(box TermDa::Inferable(
+            box TermUa::Bound(1),
+        )));
     }
 
     #[test]
@@ -256,7 +242,9 @@ mod tests {
 
     #[test]
     fn create_free() {
-        fn _free(x: String) -> TermDa { TermDa::Inferable(box TermUa::Free(Name::Global(x))) }
+        fn _free(x: String) -> TermDa {
+            TermDa::Inferable(box TermUa::Free(Name::Global(x)))
+        }
 
         // free x =Inf (Free (Global x))
     }
