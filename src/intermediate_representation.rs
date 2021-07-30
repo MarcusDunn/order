@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 #[derive(Debug, Eq, PartialEq, Clone)]
 // term uparrow
 enum TermUa {
@@ -27,9 +29,11 @@ enum Type {
     Function(Box<Type>, Box<Type>),
 }
 
+trait CloneableClosure: Fn(Value) -> Value + Clone {}
+
 #[derive(Clone)]
 enum Value {
-    Lambda(Box<fn(Value) -> Value>),
+    Lambda(Rc<dyn Fn(Value) -> Value>),
     Neutral(Box<Neutral>),
 }
 
@@ -53,19 +57,32 @@ enum Neutral {
 }
 
 impl TermUa {
-    fn eval(self, env: &[Value]) -> Value {
+    fn eval(self, env: Vec<Value>) -> Value {
         match self {
             TermUa::Annotated(box e, _) => e.eval(env),
             TermUa::Bound(i) => env.get(i as usize).unwrap().clone(),
             TermUa::Free(x) => Value::v_free(x),
-            TermUa::Application(box e, box ep) => e.eval(env).v_app(ep.eval(env)),
+            TermUa::Application(box e, box ep) => e.eval(env.clone()).v_app(ep.eval(env)),
         }
     }
 }
 
+/*
+eval↓ :: Term↓ →Env →Value
+eval↓ (Inf i)d =eval↑ i d
+eval↓ (Lam e)d =VLam (λx →eval↓ e (x : d))
+ */
 impl TermDa {
-    fn eval(self, env: &[Value]) -> Value {
-        todo!()
+    fn eval(self, env: Vec<Value>) -> Value {
+        match self {
+            TermDa::Inferable(box i) => i.eval(env),
+            TermDa::Lambda(box e) => {
+                Value::Lambda(Rc::new(move |x: Value| {
+                    env.to_vec().extend_one(x);
+                    e.clone().eval(env.clone())
+                }))
+            }
+        }
     }
 }
 
@@ -242,16 +259,39 @@ mod tests {
 
     #[test]
     fn create_free() {
+        // free x =Inf (Free (Global x))
         fn _free(x: String) -> TermDa {
             TermDa::Inferable(box TermUa::Free(Name::Global(x)))
         }
+    }
 
-        // free x =Inf (Free (Global x))
+    #[test]
+    fn create_term1() {
+        // term1 =Ann id′ (Fun (tfree "a")(tfree "a")):@: free "y"
+        let id = TermDa::Lambda(box TermDa::Inferable(box TermUa::Bound(0)));
+        let t_free = |a: String| Type::Free(Name::Global(a));
+        let free = |x: String| TermDa::Inferable(box TermUa::Free(Name::Global(x)));
+        let term1 = TermUa::Application(
+            box TermUa::Annotated(box id, Type::Function(box t_free(String::from("a")), box t_free(String::from("a")))),
+            box free(String::from("y")),
+        );
+    }
+
+    #[test]
+    fn eval_and_quote_term1() {
+        let id = TermDa::Lambda(box TermDa::Inferable(box TermUa::Bound(0)));
+        let t_free = |a: String| Type::Free(Name::Global(a));
+        let free = |x: String| TermDa::Inferable(box TermUa::Free(Name::Global(x)));
+        let term1 = TermUa::Application(
+            box TermUa::Annotated(box id, Type::Function(box t_free(String::from("a")), box t_free(String::from("a")))),
+            box free(String::from("y")),
+        );
+        let result = quote0(term1.eval(vec![]));
+        println!("{:?}", result)
     }
 
     // quote0 (eval↑ term1 [ ])
 
-    // term1 =Ann id′ (Fun (tfree "a")(tfree "a")):@: free "y"
     // term2 =Ann const′ (Fun (Fun (tfree "b")(tfree "b"))
     // (Fun (tfree "a")
     // (Fun (tfree "b")(tfree "b"))))
