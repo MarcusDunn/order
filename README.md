@@ -1,6 +1,8 @@
 # Order
 ![Build](https://github.com/MarcusDunn/order/actions/workflows/build.yml/badge.svg)
 
+Rust is hard so go check out https://github.com/MarcusDunn/depends where I don't get abused by the borrow checker
+
 a parser, a type checker, and an interpreter for a language implementing [Martin-Löf type theory](https://en.wikipedia.org/wiki/Intuitionistic_type_theory) (hopefully)
 
 ## Goals (WIP)
